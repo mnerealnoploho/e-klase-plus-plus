@@ -113,3 +113,16 @@ test('manifest is installable without disclosing any account data',async()=>{
   const result=await server.default.fetch(new Request('https://test.example/manifest.webmanifest'),{});assert.equal(result.status,200);assert.equal((await result.json()).display,'standalone');
 });
 
+
+test('same-origin Safari form submissions with opaque Origin can unlock',async()=>{
+  const result=await server.default.fetch(new Request('https://test.example/++/unlock',{method:'POST',headers:{origin:'null','sec-fetch-site':'same-origin','content-type':'application/x-www-form-urlencoded'},body:'password=synthetic-test-password&returnTo=%2Fhome'}),env);
+  assert.equal(result.status,303);assert.equal(result.headers.get('location'),'/home');assert.ok(result.headers.get('set-cookie').includes('HttpOnly'));
+});
+test('opaque origins without same-origin metadata and cross-site submissions are denied',async()=>{
+  for(const headers of [{origin:'null'},{origin:'null','sec-fetch-site':'cross-site'},{origin:'null','sec-fetch-site':'same-site'},{origin:'https://attacker.example','sec-fetch-site':'same-origin'},{origin:'https://test.example','sec-fetch-site':'cross-site'}]){
+    const result=await server.default.fetch(new Request('https://test.example/++/unlock',{method:'POST',headers,body:'password=synthetic-test-password'}),env);assert.equal(result.status,403);
+  }
+});
+test('entry page keeps same-origin referrers so native forms retain their Origin',async()=>{
+  const result=await server.default.fetch(new Request('https://test.example/'),env);assert.equal(result.headers.get('referrer-policy'),'same-origin');
+});

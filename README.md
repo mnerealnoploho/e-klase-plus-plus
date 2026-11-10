@@ -21,7 +21,15 @@ npm start
 
 Setup creates an ignored `.env` containing a hash of a generated test-site password and a session signing key. It prints the generated password once. Open `http://localhost:3000`, enter that test password, then sign into E-klase using the original login page. Existing configuration is never overwritten automatically.
 
-The local server binds to `127.0.0.1` by default. An iPhone can use the hosted web app, but Safari is not an always-running Node.js server. A backend needs a supported server runtime or HTTPS host.
+The local server binds to `127.0.0.1` by default. To test from an iPhone on the same Wi-Fi as your computer, run:
+
+```sh
+npm start -- --host 0.0.0.0
+```
+
+On Windows, run `ipconfig` and find the Wi-Fi adapter’s IPv4 address. On the iPhone, open `http://<computer-ipv4>:3000` in Safari. This is the computer’s address, not `localhost` on the phone. The computer must remain running and its firewall must allow Node.js on your private network. The local setup prints its own password; the hosted test password is separate. Use the HTTPS hosted version for normal sign-in and Home Screen use. Bare LAN HTTP does not provide HTTPS protection or full PWA support.
+
+ An iPhone can use the hosted web app, but Safari is not an always-running Node.js server. A backend needs a supported server runtime or HTTPS host.
 
 ## Free-host option
 
