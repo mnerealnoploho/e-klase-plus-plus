@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111318">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Your school day, with more clarity. Grades, planning, notes and encrypted backups.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<title>E-klase++</title>
+</head>
+<body>
+<div class="background" aria-hidden="true"></div>
+<aside class="sidebar">
+<a class="brand" href="#home"><span class="brand-mark">e<span>++</span></span><strong>E-klase<span>Plus a little more.</span></strong></a>
+<div class="nav-label">YOUR WORKSPACE</div>
+<nav id="desktop-nav" aria-label="Main navigation"></nav>
+<div class="sidebar-footer"><div class="privacy-dot"></div><span>Personal by design<br><small>Your workspace. Your data.</small></span></div>
+</aside>
+<div class="workspace">
+<header class="topbar"><div class="mobile-brand">e<span>++</span></div><div id="breadcrumb">Workspace <span>/</span> Overview</div><div class="top-actions"><span id="connection" class="connection">Checking connection</span><button class="icon-button" id="open-search" aria-label="Search workspace">⌕</button><button class="avatar" id="account-button" aria-label="Account">e</button></div></header>
+<main id="main" tabindex="-1"></main>
+<footer class="page-footer"><span>Built around your school day.</span><span>E-klase++ · Independent companion</span></footer>
+</div>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation"></nav>
+<dialog id="dialog"><div id="dialog-content"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
