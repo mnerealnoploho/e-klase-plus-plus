@@ -1,6 +1,6 @@
 {
   "name": "e-klase-plus-plus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -8,6 +8,8 @@
     "build": "node build.mjs",
     "test": "node --test tests.mjs",
     "dev": "node dev.mjs",
-    "check": "node --check app.js && node --check worker.mjs && node --check sw.js && node --test tests.mjs"
+    "start": "node --env-file=.env dev.mjs",
+    "setup": "node setup.mjs",
+    "check": "node --check app.js && node --check worker.mjs && node --check proxy.mjs && node --check boot.js && node --check enhance.js && node --check sw.js && node --test tests.mjs"
   }
 }

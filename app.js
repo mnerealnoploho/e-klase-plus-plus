@@ -3,7 +3,7 @@ import {defaults,average,weighted,required,estimate,median,csv,calendar,validate
 const main=document.querySelector('#main');
 const dialog=document.querySelector('#dialog');
 const tabs=[['home','◫','Overview'],['live','◎','E-klase'],['grades','▥','Grades'],['planner','▦','Planner'],['notes','▤','Notes'],['focus','◷','Focus'],['backup','⇅','Backups'],['settings','⚙','Customize']];
-let state=defaults(),db,connected=false,configured=false,view='home',filter='',taskFilter='open',selectedDay='',catalog={},liveOperation='diary.get',liveData=null,liveError='',liveLoading=false;
+let state=defaults(),db,connected=false,configured=false,view='home',filter='',taskFilter='open',selectedDay='',catalog={},liveData=null;
 let toastTimer,storageReady=false;
 const dateText=(value,options={day:'numeric',month:'short'})=>new Date(value).toLocaleDateString('en-GB',options);
 const today=()=>new Date().toLocaleDateString('en-CA');
@@ -51,7 +51,7 @@ function navigation() {
   const html=tabs.map(([name,symbol,label])=>'<a href="#'+name+'" class="nav-item '+(view===name?'active':'')+'" data-tab="'+name+'" '+(view===name?'aria-current="page"':'')+'>'+icon(symbol)+'<span>'+label+'</span>'+(name==='planner'&&state.tasks.some(task=>!task.complete)?'<span class="badge">'+state.tasks.filter(task=>!task.complete).length+'</span>':'')+'</a>').join('');
   document.querySelector('#desktop-nav').innerHTML=html;document.querySelector('#mobile-nav').innerHTML=html;
   document.querySelector('#breadcrumb').innerHTML='Workspace <span>/</span> '+e(tabs.find(tab=>tab[0]===view)?.[2]||'Overview');
-  const status=document.querySelector('#connection');status.className='connection '+(connected?'online':'');status.textContent=!navigator.onLine?'Offline workspace':connected?'E-klase connected':'E-klase not connected';
+  const status=document.querySelector('#connection');status.className='connection '+(connected?'online':'');status.textContent=!navigator.onLine?'Offline workspace':connected?'E-klase connected':'E-klase papildu rīki';
 }
 
 function stat(label,value,sub,symbol) { return '<div class="stat"><div class="stat-top"><span>'+label+'</span><span>'+symbol+'</span></div><div class="stat-value">'+value+'</div><small>'+sub+'</small></div>'; }
@@ -68,8 +68,8 @@ function home() {
   const complete=state.tasks.filter(task=>task.complete).length;
   const averageGrade=weighted(numeric.map(grade=>[grade.value,grade.weight]));
   const hour=new Date().getHours(),greeting=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
-  return heading('A LITTLE MORE CLARITY',greeting+'.','Your school day, all in one place.','<span class="date-chip">'+e(dateText(new Date(),{weekday:'short',day:'numeric',month:'long'}))+'</span>')+
-  '<section class="hero"><div><span class="tag">YOUR SCHOOL DAY, UPGRADED</span><h2>Less keeping track.<br>More moving forward.</h2><p>Bring your plans, grades, and ideas together. Make room for what comes next.</p>'+button(connected?'Open your E-klase ↗':'Connect your E-klase ↗',connected?'go-live':'login','')+'</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="spark"></div><div class="mini-card top"><span>✓</span><div>One thing at a time<small>A little progress, every day</small></div></div><div class="mini-card bottom"><b>↗</b><div>A clearer picture<small>Goals you can work towards</small></div></div></div></section>'+
+  return heading('E-KLASE++ PAPILDU RĪKI',greeting+'.','Plāni, piezīmes un aprēķini blakus ierastajai E-klasei.','<span class="date-chip">'+e(dateText(new Date(),{weekday:'short',day:'numeric',month:'long'}))+'</span>')+
+  '<section class="hero"><div><span class="tag">YOUR SCHOOL DAY, UPGRADED</span><h2>Ierastā E-klase.<br>Vairāk iespēju tev.</h2><p>E-klases lapas paliek ierastajā skatā. Šeit ir tavi personīgie plāni, piezīmes, aprēķini un rezerves kopijas.</p>'+button('Atvērt E-klasi ↗','login','')+'</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="spark"></div><div class="mini-card top"><span>✓</span><div>One thing at a time<small>A little progress, every day</small></div></div><div class="mini-card bottom"><b>↗</b><div>A clearer picture<small>Goals you can work towards</small></div></div></div></section>'+
   '<section class="stats">'+stat('Personal grade average',round(averageGrade),numeric.length+' numeric entries · weighted','↗')+stat('On your to-do list',pending.length,'Plans waiting for their next step','◷')+stat('Ideas & remarks',state.notes.length,'Your personal notes, saved here','▤')+stat('Completed plans',complete,'Small steps worth counting','✓')+'</section>'+
   '<div class="grid"><section class="card"><div class="card-heading"><h2>Coming up next</h2>'+button('+ Add plan','add-task','ghost small')+'</div>'+(pending.length?pending.slice(0,4).map(taskRow).join(''):empty('▦','A little space to plan','Add homework, a deadline, or a reminder for a day that matters.',button('Create your first plan','add-task','secondary small')))+'</section><section class="card"><div class="card-heading"><h2>Your grade picture</h2><a class="subtle" href="#grades">View all ↗</a></div>'+(numeric.length?distribution(numeric):empty('▥','Start with a clear picture','Connect E-klase to inspect your reports, or add your own grade entries for calculations.',button('Explore grades','go-grades','secondary small')))+'</section></div>'+
   '<div class="card"><div class="card-heading"><h2>A few useful shortcuts</h2><small>Make it yours</small></div><div class="links-grid"><a class="shortcut" href="#notes"><span>▤</span><strong>Notes for any day</strong><small>Remarks, ideas, and things to remember.</small></a><a class="shortcut" href="#focus"><span>◷</span><strong>A little focus time</strong><small>Give the next task your attention.</small></a><a class="shortcut" href="#backup"><span>⇅</span><strong>Keep a safe copy</strong><small>Password-encrypted backups for Files.</small></a></div></div>';
@@ -125,7 +125,7 @@ function settings() {
 }
 
 function operationLabel(name) {
-  return ({'diary.get':'Diary & timetable','homework.list':'Homework','diary.testSchedules':'Upcoming tests','diary.lessonTimes':'Lesson times','evaluations.summary':'Grade overview','reports.journals':'Subject journals','reports.journal':'Subject report','evaluations.ratings':'Class rankings','evaluations.testReport':'Assessment breakdown','attendance.statistics':'Attendance statistics','mail.folders':'Message folders','profiles.currentUser':'Account profile','diary.studyYearPeriods':'Study periods','home.news':'School news','home.teacherMessages':'Teacher remarks','surveys.list':'Surveys','meetings.list':'Video meetings','links.list':'School links','profiles.byYear':'Available profiles'})[name]||name.replaceAll('.',' · ');
+  return ({'page.snapshot':'E-klase lapas kopija','diary.get':'Diary & timetable','homework.list':'Homework','diary.testSchedules':'Upcoming tests','diary.lessonTimes':'Lesson times','evaluations.summary':'Grade overview','reports.journals':'Subject journals','reports.journal':'Subject report','evaluations.ratings':'Class rankings','evaluations.testReport':'Assessment breakdown','attendance.statistics':'Attendance statistics','mail.folders':'Message folders','profiles.currentUser':'Account profile','diary.studyYearPeriods':'Study periods','home.news':'School news','home.teacherMessages':'Teacher remarks','surveys.list':'Surveys','meetings.list':'Video meetings','links.list':'School links','profiles.byYear':'Available profiles'})[name]||name.replaceAll('.',' · ');
 }
 
 function tree(value,depth=0) {
@@ -137,27 +137,11 @@ function tree(value,depth=0) {
   return '<div class="data-tree">'+entries.slice(0,200).map(([key,item])=>typeof item==='object'&&item!==null?'<details '+(depth===0&&entries.length<3?'open':'')+'><summary>'+e((item.name||item.title||item.journalName||item.classJournalName||key))+(Array.isArray(item)?' <span class="pill">'+item.length+'</span>':'')+'</summary><div class="children">'+tree(item,depth+1)+'</div></details>':'<div class="pair"><span class="key">'+e(key)+'</span>'+tree(item,depth+1)+'</div>').join('')+(entries.length>200?'<p class="subtle">Showing 200 entries. Download JSON for the full report.</p>':'')+'</div>';
 }
 
-function live() {
-  const operation=catalog[liveOperation],operations=Object.keys(catalog).filter(name=>name!=='auth.config');
-  const fields=operation?[...operation.path.matchAll(/\{([^}]+)\}/g)].map(match=>'<label class="field"><span>'+e(match[1])+'</span><input name="param:'+e(match[1])+'" required placeholder="ID returned by E-klase"></label>').join('')+operation.query.map(key=>'<label class="field"><span>'+e(key)+'</span><input name="query:'+e(key)+'" '+(/from|to/.test(key)?'type="date"':'placeholder="Optional filter"')+'></label>').join(''):'';
-  return heading('YOUR ACCOUNT, CONNECTED','E-klase, a little closer.','Load live account reports when a compatible sign-in succeeds.',button(connected?'Account connected':'Connect account','login',connected?'secondary':''))+
-  (!connected?'<div class="info warn"><strong>Live connection is not verified yet.</strong> The current E-klase sign-in differs from the older public client. This app will report an unsupported flow instead of pretending to connect. Your existing Cloud Browser login is separate.</div>':'<div class="info"><strong>Connected.</strong> Account data is fetched only when you request it. Saved snapshots include a timestamp; your E-klase access permissions still apply.</div>')+
-  '<div class="grid"><section class="card"><div class="card-heading"><h2>Choose a report</h2><span class="pill">Read only</span></div><form id="live-form"><label class="field"><span>Account section</span><select id="operation">'+operations.map(name=>'<option value="'+e(name)+'" '+(name===liveOperation?'selected':'')+'>'+e(operationLabel(name))+'</option>').join('')+'</select></label><div class="two">'+fields+'</div><button class="button" '+(!connected||liveLoading?'disabled':'')+' type="submit">'+(liveLoading?'Loading…':'Load live report ↗')+'</button></form><p class="subtle" style="margin-top:17px">Use IDs and dates returned by your own account. This view does not modify school records or infer account permissions.</p></section><section class="card"><div class="card-heading"><h2>Prefer the original?</h2></div><p class="subtle">The official E-klase site remains the reliable place for account changes, messaging, forms, and unsupported features.</p><div class="toolbar" style="margin-top:20px"><a class="button secondary" href="https://family.e-klase.lv/" target="_blank" rel="noopener noreferrer">Open official E-klase ↗</a></div><div class="links-grid"><a class="shortcut" href="#notes"><span>▤</span><strong>Personal remarks</strong><small>Notes that are just for you.</small></a><a class="shortcut" href="#planner"><span>▦</span><strong>Plan a day</strong><small>Your own tasks and reminders.</small></a></div></section></div>'+
-  (liveError?'<div class="info warn" role="alert">'+e(liveError)+'</div>':'')+
-  (liveData?'<section class="card"><div class="card-heading"><div><h2>'+e(operationLabel(liveData.operation))+'</h2><small>Loaded '+e(new Date(liveData.captured).toLocaleString('en-GB'))+'</small></div><div class="toolbar">'+button('Save snapshot','save-live','secondary small')+button('Download JSON','export-live','secondary small')+'</div></div>'+renderDiary(liveData)+tree(liveData.data)+'</section>':'');
-}
-
-function renderDiary(report) {
-  if(report.operation!=='diary.get'||!Array.isArray(report.data)) return '';
-  return report.data.map(day=>'<div class="date-line">'+e(dateText(day.date,{weekday:'long',day:'numeric',month:'long'}))+'</div>'+(Array.isArray(day.lessons)?day.lessons:[]).map(lesson=>'<div class="row"><div class="grade">'+e(lesson.lessonNumber)+'</div><div class="row-main"><h3>'+e(lesson.classJournalName)+'</h3><p>'+e(lesson.roomNumber||'')+'</p>'+((lesson.homeTasks||[]).map(task=>'<p>'+e(task.task?.text||'')+'</p>').join(''))+'</div></div>').join('')).join('');
-}
-
 function render() {
   appearance();navigation();
-  const pages={home,live,grades,planner,notes,focus,backup,settings};
+  const pages={home,live:()=>heading('E-KLASE','Ierastā E-klase.','Atver oriģinālās E-klases lapas ar papildu ++ rīkiem.','<a class="button" href="/home">Atvērt E-klasi</a>'),grades,planner,notes,focus,backup,settings};
   main.innerHTML='<div class="'+(state.settings.motion?'fade':'')+'">'+(pages[view]||home)()+'</div>';
   if(view==='focus') tick();
-  document.querySelector('#live-form')?.addEventListener('submit',loadLive);
   for(const [selector,key] of [['#grade-search','grades'],['#task-search','planner'],['#note-search','notes']]) {
     const input=document.querySelector(selector);input?.addEventListener('input',()=>{const position=input.selectionStart;filter=input.value;render();const replacement=document.querySelector(selector);replacement?.focus();replacement?.setSelectionRange(position,position);});
   }
@@ -205,20 +189,14 @@ function chartEstimate() {
   modal('Estimate from a chart','<div class="info warn">An estimate is not an official grade. Use two visible labeled values from the same chart and measure the same dimension for all bars. A changing baseline or nonlinear scale makes the result unreliable.</div><div class="two">'+field('first','First visible value',6,'number','required step="any"')+field('firstSize','First bar size (px)',120,'number','required min="0" step="any"')+field('second','Second visible value',9,'number','required step="any"')+field('secondSize','Second bar size (px)',180,'number','required min="0" step="any"')+field('size','Unlabeled bar size (px)',156,'number','required min="0" step="any"')+field('error','Measurement uncertainty (px)',1,'number','required min="0" step="any"')+'</div>',async form=>{const result=estimate(...['first','firstSize','second','secondSize','size','error'].map(name=>Number(form.get(name))));if(!result)throw Error('The two calibration bar sizes must differ.');toast('Estimated value: '+round(result.value)+' ± '+round(result.uncertainty)+'. Rendering uncertainty only; scale assumptions may add error.');},'Estimate');
 }
 
-function loginForm() {
-  modal('Connect your E-klase','<div class="info warn"><strong>Experimental connection.</strong> This private backend uses the public web login flow. The current flow may need interactive sign-in that is not yet supported. Credentials are not stored or logged.</div>'+field('username','E-klase username','','text','required autocomplete="username" maxlength="200"')+field('password','E-klase password','','password','required autocomplete="current-password" maxlength="1024"')+'<p class="subtle">The app server processes your login and sends it only to auth.e-klase.lv if it recognizes a valid POST form. If unsupported, it stops. Your existing E-klase browser session is not imported.</p>',async form=>{const result=await api('/api/login',{username:form.get('username'),password:form.get('password')});connected=result.connected;toast('E-klase connected.');},'Connect account');
-}
+
+function loginForm(){ location.assign('/home'); }
 
 async function api(path,body) {
-  const result=await fetch(path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,credentials:'same-origin',cache:'no-store'});
+  const result=await fetch(path.startsWith('/api/')?'/++'+path:path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,credentials:'same-origin',cache:'no-store'});
   const type=result.headers.get('content-type')||'';
   if(!type.includes('application/json'))throw Error('Sign in to the private app in Safari, then try again.');
   const value=await result.json();if(!result.ok) {if(result.status===401)connected=false;throw Error(value.error||'The connection could not be completed.');}return value;
-}
-
-async function loadLive(event) {
-  event.preventDefault();const form=new FormData(event.currentTarget),query={},params={};for(const [key,value]of form)if(value){if(key.startsWith('query:'))query[key.slice(6)]=value;if(key.startsWith('param:'))params[key.slice(6)]=value;}
-  liveLoading=true;liveError='';render();try{liveData=await api('/api/read',{operation:liveOperation,query,params});}catch(error){liveError=error.message;toast(error.message);}finally{liveLoading=false;render();}
 }
 
 function download(data,name,type='application/octet-stream') {
@@ -286,7 +264,7 @@ async function action(name,element) {
   if(name==='save-live'){if(!liveData)return;state.reports.unshift({...liveData,id:id(),label:'Account report'});state.reports=state.reports.slice(0,2000);await save();toast('Time-stamped snapshot saved to Grades.');return;}
   if(name==='export-live'){if(liveData)download(JSON.stringify(liveData,null,2),'eklase-report-'+today()+'.json','application/json');return;}
   if(name==='open-report'){const report=state.reports.find(item=>item.id===key);document.querySelector('#dialog-content').innerHTML='<div class="dialog-heading"><h2>'+e(operationLabel(report.operation))+'</h2>'+button('Close','close','ghost small')+'</div><p class="subtle">Snapshot from '+e(new Date(report.captured).toLocaleString('en-GB'))+'</p>'+tree(report.data);dialog.showModal();return;}
-  if(name==='logout'){await api('/api/logout',{});connected=false;liveData=null;toast('E-klase session disconnected. Your personal workspace remains.');render();return;}
+  if(name==='logout'){location.assign('/++/lock');return;}
   if(name==='install'){modal('Add E-klase++ to your iPhone','<div class="info"><strong>In Safari:</strong> tap Share → Add to Home Screen → keep Open as Web App enabled → Add.</div><p class="subtle">Open the app online once. Your personal workspace then works offline. Live E-klase reports require the hosted backend and an active connection.</p>',async()=>{},'Got it');return;}
 }
 
@@ -306,6 +284,6 @@ matchMedia('(prefers-color-scheme:light)').addEventListener('change',appearance)
 
 try{await load();}catch(error){toast('Saved data could not be opened: '+error.message);document.querySelector('#connection').textContent='Storage unavailable';}
 view=location.hash.slice(1)||'home';render();
-try{catalog=await fetch('/operations.json').then(result=>result.json());if(view==='live')render();}catch{}
+try{catalog=await fetch('/++/operations.json').then(result=>result.json());if(view==='live')render();}catch{}
 try{const session=await api('/api/session');connected=session.connected;configured=session.configured;navigation();}catch{navigation();}
 if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>toast('Offline setup could not complete. Try opening the app online again.'));

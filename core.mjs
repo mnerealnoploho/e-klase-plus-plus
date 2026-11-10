@@ -1,4 +1,4 @@
-export const defaults = () => ({version:1,tasks:[],notes:[],grades:[],goals:[],reports:[],settings:{theme:'dark',accent:'#ff775e',motion:true,effects:true,density:'comfortable',font:16,background:'',opacity:0.14,blur:0},focus:null,lastBackup:null});
+export const defaults = () => ({version:1,tasks:[],notes:[],grades:[],goals:[],reports:[],settings:{theme:'light',accent:'#4f79e8',motion:true,effects:false,density:'comfortable',font:16,background:'',opacity:0.14,blur:0},focus:null,lastBackup:null});
 
 export function average(values) {
   return values.length && values.every(Number.isFinite) ? values.reduce((sum,value)=>sum+value,0)/values.length : null;

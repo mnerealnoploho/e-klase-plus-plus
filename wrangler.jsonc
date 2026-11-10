@@ -1,0 +1,8 @@
+{
+  "name": "e-klase-plus-plus",
+  "main": "dist/server/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "build": { "command": "npm run build" },
+  "observability": { "enabled": false }
+}

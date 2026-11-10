@@ -1,13 +1,15 @@
 # Privacy
 
-Personal grades, plans, notes, goals, images, and saved responses are stored in this device’s IndexedDB. They are not automatically synchronized to a database or uploaded to GitHub. The public repository contains source and synthetic tests only.
+The test host loads original E-klase pages through a proxy restricted to the family and authentication service hosts. Your browser runs the original client. Login fields and account requests pass through the HTTPS test backend to E-klase. App code does not intentionally log request bodies, credentials, tokens, or account responses. The hosting operator still controls the code running on that host; use only an instance you trust.
 
-When connecting E-klase, credentials pass through this app’s HTTPS backend. It forwards them only to the recognized official authentication origin and does not intentionally store or log them. An unknown login form stops before submission. The current flow is experimental and unverified.
+The test-site password is a separate access credential. Its hash is stored in server configuration. A signed HttpOnly cookie records access for seven days; HTTPS uses Secure and the __Host- prefix. No plaintext test password is committed to the repository.
 
-Successful access tokens are encrypted in a Secure, HttpOnly, SameSite=Strict cookie bound to the private host’s authenticated owner. They expire with the upstream session. The password is not stored for automatic reauthentication. Disconnecting removes the app’s E-klase session cookie.
+Authentication and family cookies are namespaced separately on the test host and mapped back only for requests to their corresponding original host. The app gate cookie, hosting headers, and unrelated browser cookies are not sent to E-klase. No shared school-data database is created.
 
-Account responses pass through the backend only on request. They use Cache-Control: no-store and are excluded from service-worker caches. Saving a snapshot stores that response on the device. The application has no analytics trackers. Hosting providers may retain standard operational logs; application code does not log credentials or school data.
+Personal grades, notes, plans, goals, images, and saved report snapshots use this device’s IndexedDB. Clicking Save report stores only the supported visible report data. It does not inspect password fields or collect authentication storage. These records are not automatically uploaded to GitHub or synchronized across devices.
 
-Backup encryption happens locally. Choosing iCloud Drive uploads the encrypted file through Apple Files. The app does not receive the backup password. Restore replaces the workspace after the user confirms.
+The offline cache contains only static personal tools. Live E-klase pages, APIs, JSON, and login responses are excluded. Existing caches from version 0.1 are removed when the new service worker activates.
 
-Anyone with access to the unlocked browser profile may access the workspace. Export a backup before clearing site data. The developer cannot recover an encrypted backup password.
+Backup encryption occurs on the device. Saving to iCloud Drive uploads the encrypted file through Apple Files. E-klase cookies, credentials, and tokens are not included. Restore requires the backup password and explicit confirmation before replacing local data.
+
+E-klase’s own resources, embedded services, account policies, and third-party links remain subject to their respective privacy terms. This project adds no analytics tracker. Hosting providers may keep operational request metadata independently of application logging.

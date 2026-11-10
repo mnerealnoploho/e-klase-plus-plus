@@ -1,5 +1,7 @@
 # Website inventory and implementation scope
 
+Version 0.2 uses the original family portal as the main interface. The companion-handling column below describes the earlier 0.1 implementation inventory; it is retained as a record of what was inspected. The original website, rather than that old report picker, now handles account screens. Real account sign-in and end-to-end compatibility still require verification on the test host.
+
 Inspected in the authorized family portal on 2026-11-10. No account values or personal identifiers are included.
 
 | Area | Observed website features | Companion handling |
@@ -18,4 +20,4 @@ Inspected in the authorized family portal on 2026-11-10. No account values or pe
 | Appearance | Light, dark, high contrast, system | Independent appearance controls |
 | Notifications | SMS, email, official mobile push settings | Calendar exports for personal reminders |
 
-The endpoint catalog references public September 2026 research. It does not establish that every operation currently works. The current login needs a verified compatible adapter before live account support can be claimed.
+The historical endpoint catalog references public September 2026 research. Version 0.2 no longer uses that catalog or the removed form-parsing adapter for login. The original client runs through the restricted proxy; a successful real account login is still required before claiming complete compatibility.
